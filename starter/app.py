@@ -30,5 +30,23 @@ def check_solution():
     return jsonify({'incorrect': incorrect})
 
 
+@app.route('/hint')
+def get_hint():
+    if game_store.solution is None:
+        return jsonify({'error': 'No game in progress'}), 400
+    if game_store.puzzle is None:
+        return jsonify({'error': 'No game in progress'}), 400
+
+    for row in range(len(game_store.puzzle)):
+        for col in range(len(game_store.puzzle[row])):
+            if game_store.puzzle[row][col] == 0:
+                return jsonify({
+                    'row': row,
+                    'col': col,
+                    'value': game_store.solution[row][col]
+                })
+    return jsonify({'error': 'No empty cells remain'}), 400
+
+
 if __name__ == '__main__':
     app.run(debug=True)
