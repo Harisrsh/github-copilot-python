@@ -33,6 +33,34 @@ def test_check_solution_route_returns_error_without_game(client):
     assert response.get_json()['error'] == 'No game in progress'
 
 
+def test_new_game_route_rejects_invalid_difficulty(client):
+    response = client.get('/new?difficulty=banana')
+
+    assert response.status_code == 400
+    assert response.get_json()['error'] == 'Invalid difficulty value'
+
+
+def test_check_solution_route_rejects_malformed_json(client):
+    response = client.post('/check', data='not-json', content_type='application/json')
+
+    assert response.status_code == 400
+    assert response.get_json()['error'] == 'Request body must be valid JSON'
+
+
+def test_check_solution_route_rejects_invalid_board_payload(client):
+    response = client.post('/check', json={'board': 'not-a-board'})
+
+    assert response.status_code == 400
+    assert response.get_json()['error'] == 'Board must be a 9x9 grid of integers'
+
+
+def test_hint_route_returns_error_without_game(client):
+    response = client.get('/hint')
+
+    assert response.status_code == 400
+    assert response.get_json()['error'] == 'No game in progress'
+
+
 def test_check_solution_route_reports_incorrect_cells(client):
     with app_module.app.test_client() as client_one:
         with client_one.session_transaction() as session:
