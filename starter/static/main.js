@@ -78,6 +78,11 @@ function addScoreToLeaderboard(name, timeSeconds, difficulty, hintsUsedCount) {
   renderLeaderboard();
 }
 
+function applyTheme(isDark) {
+  document.body.classList.toggle('dark-theme', isDark);
+  localStorage.setItem('sudoku-theme', isDark ? 'dark' : 'light');
+}
+
 function getBoardValues() {
   const boardDiv = document.getElementById('sudoku-board');
   const inputs = boardDiv.getElementsByTagName('input');
@@ -267,6 +272,15 @@ window.addEventListener('load', () => {
   document.getElementById('new-game').addEventListener('click', newGame);
   document.getElementById('check-solution').addEventListener('click', checkSolution);
   document.getElementById('hint').addEventListener('click', applyHint);
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const isDark = !document.body.classList.contains('dark-theme');
+    applyTheme(isDark);
+    document.getElementById('theme-toggle').innerText = isDark ? 'Switch to Light Mode' : 'Toggle Dark Mode';
+  });
+  const savedTheme = localStorage.getItem('sudoku-theme');
+  const isDark = savedTheme === 'dark';
+  applyTheme(isDark);
+  document.getElementById('theme-toggle').innerText = isDark ? 'Switch to Light Mode' : 'Toggle Dark Mode';
   renderLeaderboard();
   // initialize
   newGame();
