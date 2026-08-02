@@ -1,10 +1,21 @@
-from flask import Flask, jsonify, render_template, request
+import os
+
+from flask import Flask, jsonify, render_template, request, session
 
 from sudoku import GameStore, find_incorrect_cells, generate_puzzle_for_difficulty
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 
-game_store = GameStore()
+
+def get_session_game_store():
+    if 'game_store' not in session:
+        session['game_store'] = GameStore().to_dict()
+    return GameStore.from_dict(session['game_store'])
+
+
+def save_session_game_store(game_store):
+    session['game_store'] = game_store.to_dict()
 
 
 @app.route('/')
@@ -16,7 +27,9 @@ def index():
 def new_game():
     difficulty = request.args.get('difficulty', 'medium')
     puzzle, solution = generate_puzzle_for_difficulty(difficulty)
+    game_store = get_session_game_store()
     game_store.set_game(puzzle, solution)
+    save_session_game_store(game_store)
     return jsonify({'puzzle': puzzle})
 
 
@@ -24,6 +37,7 @@ def new_game():
 def check_solution():
     data = request.json or {}
     board = data.get('board')
+    game_store = get_session_game_store()
     if game_store.solution is None:
         return jsonify({'error': 'No game in progress'}), 400
     incorrect = find_incorrect_cells(board, game_store.solution)
@@ -32,6 +46,7 @@ def check_solution():
 
 @app.route('/hint')
 def get_hint():
+    game_store = get_session_game_store()
     if game_store.solution is None:
         return jsonify({'error': 'No game in progress'}), 400
     if game_store.puzzle is None:
