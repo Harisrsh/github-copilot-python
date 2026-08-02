@@ -5,6 +5,7 @@ let timerStart = null;
 let timerInterval = null;
 let currentDifficulty = 'medium';
 let hintsUsed = 0;
+const LEADERBOARD_KEY = 'sudoku-leaderboard';
 
 function formatTime(seconds) {
   const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -29,6 +30,52 @@ function stopTimer() {
     window.clearInterval(timerInterval);
     timerInterval = null;
   }
+}
+
+function loadLeaderboard() {
+  const stored = localStorage.getItem(LEADERBOARD_KEY);
+  if (!stored) return [];
+  try {
+    return JSON.parse(stored);
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveLeaderboard(entries) {
+  localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
+}
+
+function renderLeaderboard() {
+  const entries = loadLeaderboard().sort((a, b) => a.timeSeconds - b.timeSeconds);
+  const tbody = document.getElementById('leaderboard-body');
+  tbody.innerHTML = '';
+  if (entries.length === 0) {
+    const emptyRow = document.createElement('tr');
+    emptyRow.innerHTML = '<td colspan="5">No scores yet</td>';
+    tbody.appendChild(emptyRow);
+    return;
+  }
+  entries.slice(0, 10).forEach((entry, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${entry.name}</td>
+      <td>${formatTime(entry.timeSeconds)}</td>
+      <td>${entry.difficulty}</td>
+      <td>${entry.hintsUsed}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function addScoreToLeaderboard(name, timeSeconds, difficulty, hintsUsedCount) {
+  const entries = loadLeaderboard();
+  entries.push({name, timeSeconds, difficulty, hintsUsed: hintsUsedCount});
+  entries.sort((a, b) => a.timeSeconds - b.timeSeconds);
+  const topEntries = entries.slice(0, 10);
+  saveLeaderboard(topEntries);
+  renderLeaderboard();
 }
 
 function getBoardValues() {
@@ -204,6 +251,11 @@ async function checkSolution() {
     const elapsedSeconds = Math.floor((Date.now() - timerStart) / 1000);
     msg.style.color = '#388e3c';
     msg.innerText = `Congratulations! You solved it in ${formatTime(elapsedSeconds)} on ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)} difficulty.`;
+
+    const playerName = window.prompt('Enter your name for the leaderboard:', 'Player');
+    if (playerName) {
+      addScoreToLeaderboard(playerName.trim(), elapsedSeconds, currentDifficulty, hintsUsed);
+    }
   } else {
     msg.style.color = '#d32f2f';
     msg.innerText = 'Some cells are incorrect.';
@@ -215,6 +267,7 @@ window.addEventListener('load', () => {
   document.getElementById('new-game').addEventListener('click', newGame);
   document.getElementById('check-solution').addEventListener('click', checkSolution);
   document.getElementById('hint').addEventListener('click', applyHint);
+  renderLeaderboard();
   // initialize
   newGame();
 });

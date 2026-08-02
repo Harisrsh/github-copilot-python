@@ -97,3 +97,32 @@ button:hover {
     font-size: 16px;
     color: #d32f2f;
 }
+
+.leaderboard-section {
+    margin: 30px auto 40px;
+    width: min(720px, 90%);
+}
+
+.leaderboard-section h2 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+#leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+#leaderboard-table th,
+#leaderboard-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+#leaderboard-table th {
+    background: #1976d2;
+    color: #fff;
+}
