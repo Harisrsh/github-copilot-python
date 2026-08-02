@@ -59,3 +59,9 @@ def test_generate_puzzle_returns_puzzle_and_solution():
     assert len(puzzle) == sudoku.SIZE
     assert len(solution) == sudoku.SIZE
     assert puzzle != solution
+
+
+def test_generate_puzzle_creates_uniquely_solvable_puzzles():
+    for _ in range(3):
+        puzzle, _ = sudoku.generate_puzzle(clues=30)
+        assert sudoku.count_solutions(puzzle, limit=2) == 1

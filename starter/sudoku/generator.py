@@ -1,7 +1,7 @@
 import copy
 import random
 
-from .validator import is_safe
+from .validator import count_solutions, is_safe
 
 SIZE = 9
 EMPTY = 0
@@ -37,8 +37,12 @@ def remove_cells(board, clues):
         row = random.randrange(SIZE)
         col = random.randrange(SIZE)
         if board[row][col] != EMPTY:
+            value = board[row][col]
             board[row][col] = EMPTY
-            attempts -= 1
+            if count_solutions(board, limit=2) != 1:
+                board[row][col] = value
+            else:
+                attempts -= 1
 
 
 def generate_puzzle(clues=35):
