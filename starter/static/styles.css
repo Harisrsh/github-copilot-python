@@ -48,6 +48,14 @@ h1 {
     background: #ffcdd2;
 }
 
+.sudoku-cell.valid {
+    background: #e8f5e9;
+}
+
+.sudoku-cell.invalid {
+    background: #ffcdd2;
+}
+
 .sudoku-cell:nth-child(3),
 .sudoku-cell:nth-child(6) {
     border-right: 3px solid #333;

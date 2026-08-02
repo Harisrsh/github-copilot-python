@@ -30,6 +30,63 @@ function stopTimer() {
   }
 }
 
+function getBoardValues() {
+  const boardDiv = document.getElementById('sudoku-board');
+  const inputs = boardDiv.getElementsByTagName('input');
+  const board = [];
+  for (let i = 0; i < SIZE; i++) {
+    board[i] = [];
+    for (let j = 0; j < SIZE; j++) {
+      const idx = i * SIZE + j;
+      const val = inputs[idx].value;
+      board[i][j] = val ? parseInt(val, 10) : 0;
+    }
+  }
+  return board;
+}
+
+function isCellValid(board, row, col, value) {
+  if (!value) return true;
+  for (let c = 0; c < SIZE; c++) {
+    if (c !== col && board[row][c] === value) return false;
+  }
+  for (let r = 0; r < SIZE; r++) {
+    if (r !== row && board[r][col] === value) return false;
+  }
+  const boxRow = Math.floor(row / 3) * 3;
+  const boxCol = Math.floor(col / 3) * 3;
+  for (let r = boxRow; r < boxRow + 3; r++) {
+    for (let c = boxCol; c < boxCol + 3; c++) {
+      if ((r !== row || c !== col) && board[r][c] === value) return false;
+    }
+  }
+  return true;
+}
+
+function refreshLiveValidation() {
+  const board = getBoardValues();
+  const boardDiv = document.getElementById('sudoku-board');
+  const inputs = boardDiv.getElementsByTagName('input');
+  for (let i = 0; i < SIZE; i++) {
+    for (let j = 0; j < SIZE; j++) {
+      const idx = i * SIZE + j;
+      const inp = inputs[idx];
+      if (inp.disabled) {
+        inp.className = 'sudoku-cell prefilled';
+        continue;
+      }
+      const val = inp.value;
+      if (!val) {
+        inp.className = 'sudoku-cell';
+        continue;
+      }
+      const parsedValue = parseInt(val, 10);
+      const isValid = isCellValid(board, i, j, parsedValue);
+      inp.className = isValid ? 'sudoku-cell valid' : 'sudoku-cell invalid';
+    }
+  }
+}
+
 function createBoardElement() {
   const boardDiv = document.getElementById('sudoku-board');
   boardDiv.innerHTML = '';
@@ -46,6 +103,7 @@ function createBoardElement() {
       input.addEventListener('input', (e) => {
         const val = e.target.value.replace(/[^1-9]/g, '');
         e.target.value = val;
+        refreshLiveValidation();
       });
       rowDiv.appendChild(input);
     }
@@ -73,6 +131,7 @@ function renderPuzzle(puz) {
       }
     }
   }
+  refreshLiveValidation();
 }
 
 async function newGame() {
@@ -87,15 +146,7 @@ async function newGame() {
 async function checkSolution() {
   const boardDiv = document.getElementById('sudoku-board');
   const inputs = boardDiv.getElementsByTagName('input');
-  const board = [];
-  for (let i = 0; i < SIZE; i++) {
-    board[i] = [];
-    for (let j = 0; j < SIZE; j++) {
-      const idx = i * SIZE + j;
-      const val = inputs[idx].value;
-      board[i][j] = val ? parseInt(val, 10) : 0;
-    }
-  }
+  const board = getBoardValues();
   const res = await fetch('/check', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -111,7 +162,10 @@ async function checkSolution() {
   const incorrect = new Set(data.incorrect.map(x => x[0]*SIZE + x[1]));
   for (let idx = 0; idx < inputs.length; idx++) {
     const inp = inputs[idx];
-    if (inp.disabled) continue;
+    if (inp.disabled) {
+      inp.className = 'sudoku-cell prefilled';
+      continue;
+    }
     inp.className = 'sudoku-cell';
     if (incorrect.has(idx)) {
       inp.className = 'sudoku-cell incorrect';
