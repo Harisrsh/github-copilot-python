@@ -65,3 +65,17 @@ def test_generate_puzzle_creates_uniquely_solvable_puzzles():
     for _ in range(3):
         puzzle, _ = sudoku.generate_puzzle(clues=30)
         assert sudoku.count_solutions(puzzle, limit=2) == 1
+
+
+def test_difficulty_levels_generate_expected_clue_counts():
+    easy_puzzle, _ = sudoku.generate_puzzle_for_difficulty('easy')
+    medium_puzzle, _ = sudoku.generate_puzzle_for_difficulty('medium')
+    hard_puzzle, _ = sudoku.generate_puzzle_for_difficulty('hard')
+
+    easy_clues = sum(cell != sudoku.EMPTY for row in easy_puzzle for cell in row)
+    medium_clues = sum(cell != sudoku.EMPTY for row in medium_puzzle for cell in row)
+    hard_clues = sum(cell != sudoku.EMPTY for row in hard_puzzle for cell in row)
+
+    assert 40 <= easy_clues <= 50
+    assert 30 <= medium_clues <= 40
+    assert 20 <= hard_clues <= 30

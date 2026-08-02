@@ -5,6 +5,11 @@ from .validator import count_solutions, is_safe
 
 SIZE = 9
 EMPTY = 0
+DIFFICULTY_CLUES = {
+    'easy': 45,
+    'medium': 35,
+    'hard': 25,
+}
 
 
 def deep_copy(board):
@@ -52,3 +57,9 @@ def generate_puzzle(clues=35):
     remove_cells(board, clues)
     puzzle = deep_copy(board)
     return puzzle, solution
+
+
+def generate_puzzle_for_difficulty(difficulty='medium'):
+    normalized = (difficulty or 'medium').lower()
+    clues = DIFFICULTY_CLUES.get(normalized, DIFFICULTY_CLUES['medium'])
+    return generate_puzzle(clues)

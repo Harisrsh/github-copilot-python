@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, render_template, request
 
-from sudoku import GameStore, find_incorrect_cells, generate_puzzle
+from sudoku import GameStore, find_incorrect_cells, generate_puzzle_for_difficulty
 
 app = Flask(__name__)
 
@@ -14,8 +14,8 @@ def index():
 
 @app.route('/new')
 def new_game():
-    clues = int(request.args.get('clues', 35))
-    puzzle, solution = generate_puzzle(clues)
+    difficulty = request.args.get('difficulty', 'medium')
+    puzzle, solution = generate_puzzle_for_difficulty(difficulty)
     game_store.set_game(puzzle, solution)
     return jsonify({'puzzle': puzzle})
 
