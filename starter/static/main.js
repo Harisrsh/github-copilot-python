@@ -1,6 +1,34 @@
 // Client-side rendering and interaction for the Flask-backed Sudoku
 const SIZE = 9;
 let puzzle = [];
+let timerStart = null;
+let timerInterval = null;
+let currentDifficulty = 'medium';
+
+function formatTime(seconds) {
+  const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const secs = String(seconds % 60).padStart(2, '0');
+  return `${mins}:${secs}`;
+}
+
+function startTimer() {
+  stopTimer();
+  timerStart = Date.now();
+  const timerDisplay = document.getElementById('timer');
+  const updateTimer = () => {
+    const elapsedSeconds = Math.floor((Date.now() - timerStart) / 1000);
+    timerDisplay.innerText = `Time: ${formatTime(elapsedSeconds)}`;
+  };
+  updateTimer();
+  timerInterval = window.setInterval(updateTimer, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    window.clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
 
 function createBoardElement() {
   const boardDiv = document.getElementById('sudoku-board');
@@ -48,11 +76,12 @@ function renderPuzzle(puz) {
 }
 
 async function newGame() {
-  const difficulty = document.getElementById('difficulty-select').value;
-  const res = await fetch(`/new?difficulty=${encodeURIComponent(difficulty)}`);
+  currentDifficulty = document.getElementById('difficulty-select').value;
+  const res = await fetch(`/new?difficulty=${encodeURIComponent(currentDifficulty)}`);
   const data = await res.json();
   renderPuzzle(data.puzzle);
   document.getElementById('message').innerText = '';
+  startTimer();
 }
 
 async function checkSolution() {
@@ -89,8 +118,10 @@ async function checkSolution() {
     }
   }
   if (incorrect.size === 0) {
+    stopTimer();
+    const elapsedSeconds = Math.floor((Date.now() - timerStart) / 1000);
     msg.style.color = '#388e3c';
-    msg.innerText = 'Congratulations! You solved it!';
+    msg.innerText = `Congratulations! You solved it in ${formatTime(elapsedSeconds)} on ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)} difficulty.`;
   } else {
     msg.style.color = '#d32f2f';
     msg.innerText = 'Some cells are incorrect.';
