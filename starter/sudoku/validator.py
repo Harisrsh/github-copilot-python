@@ -23,7 +23,11 @@ def find_incorrect_cells(board, solution):
                 incorrect.append([i, j])
     return incorrect
 
-
+# Note: initial Copilot suggestion counted all possible solutions with no
+# early exit, which was too slow for puzzle generation on sparser boards.
+# Adjusted to stop early once `limit` (2) solutions are found, since we
+# only need to know whether the puzzle is uniquely solvable, not enumerate
+# every solution.
 def count_solutions(board, limit=2):
     def search(current_board):
         if limit <= 0:
