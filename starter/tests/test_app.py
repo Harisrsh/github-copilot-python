@@ -6,8 +6,7 @@ import app as app_module
 @pytest.fixture
 def client():
     app_module.app.config.update(TESTING=True)
-    app_module.CURRENT['puzzle'] = None
-    app_module.CURRENT['solution'] = None
+    app_module.game_store.clear()
     with app_module.app.test_client() as client:
         yield client
 
@@ -36,8 +35,10 @@ def test_check_solution_route_returns_error_without_game(client):
 
 
 def test_check_solution_route_reports_incorrect_cells(client):
-    app_module.CURRENT['solution'] = [[i + j for j in range(9)] for i in range(9)]
-    app_module.CURRENT['puzzle'] = [[0] * 9 for _ in range(9)]
+    app_module.game_store.set_game(
+        [[0] * 9 for _ in range(9)],
+        [[i + j for j in range(9)] for i in range(9)],
+    )
 
     response = client.post('/check', json={'board': [[1] * 9 for _ in range(9)]})
 
