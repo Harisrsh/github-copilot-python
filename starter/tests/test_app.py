@@ -80,3 +80,31 @@ def test_check_solution_route_reports_incorrect_cells(client):
         assert response.status_code == 200
         with client_two.session_transaction() as session:
             assert session['game_store'] is not None
+
+
+def test_hint_route_advances_to_next_empty_cell_on_subsequent_requests(client):
+    with app_module.app.test_client() as client_one:
+        with client_one.session_transaction() as session:
+            session['game_store'] = {
+                'puzzle': [[0] * 9 for _ in range(9)],
+                'solution': [[(row + col) % 9 + 1 for col in range(9)] for row in range(9)],
+            }
+
+        first_response = client_one.get('/hint')
+        assert first_response.status_code == 200
+        first_payload = first_response.get_json()
+        assert first_payload['row'] == 0
+        assert first_payload['col'] == 0
+        assert first_payload['value'] == 1
+
+        second_response = client_one.get('/hint')
+        assert second_response.status_code == 200
+        second_payload = second_response.get_json()
+        assert second_payload['row'] == 0
+        assert second_payload['col'] == 1
+        assert second_payload['value'] == 2
+
+        with client_one.session_transaction() as session:
+            puzzle = session['game_store']['puzzle']
+            assert puzzle[0][0] == 1
+            assert puzzle[0][1] == 2

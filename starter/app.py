@@ -77,6 +77,8 @@ def get_hint():
     for row in range(len(game_store.puzzle)):
         for col in range(len(game_store.puzzle[row])):
             if game_store.puzzle[row][col] == 0:
+                game_store.puzzle[row][col] = game_store.solution[row][col]
+                save_session_game_store(game_store)
                 return jsonify({
                     'row': row,
                     'col': col,

@@ -263,23 +263,23 @@ async function checkSolution() {
       throw new Error(data.error || 'Unable to check the solution.');
     }
 
-    const incorrect = new Set(data.incorrect.map(x => x[0]*SIZE + x[1]));
-    for (let idx = 0; idx < inputs.length; idx++) {
+    const incorrectIndices = new Set(
+      (Array.isArray(data.incorrect) ? data.incorrect : [])
+        .map(([row, col]) => row * SIZE + col)
+    );
+
+    for (let idx = 0; idx < inputs.length; idx += 1) {
       const inp = inputs[idx];
+      const isIncorrect = incorrectIndices.has(idx);
+
       if (inp.disabled) {
-        if (inp.className.includes('hint')) {
-          inp.className = 'sudoku-cell hint';
-        } else {
-          inp.className = 'sudoku-cell prefilled';
-        }
+        inp.className = inp.classList.contains('hint') ? 'sudoku-cell hint' : 'sudoku-cell prefilled';
         continue;
       }
-      inp.className = 'sudoku-cell';
-      if (incorrect.has(idx)) {
-        inp.className = 'sudoku-cell incorrect';
-      }
+
+      inp.className = isIncorrect ? 'sudoku-cell incorrect' : 'sudoku-cell';
     }
-    if (incorrect.size === 0) {
+    if (incorrectIndices.size === 0) {
       stopTimer();
       const elapsedSeconds = Math.floor((Date.now() - timerStart) / 1000);
       setMessage(`Congratulations! You solved it in ${formatTime(elapsedSeconds)} on ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)} difficulty.`);

@@ -108,19 +108,19 @@ h1 {
     background: var(--cell-focus);
 }
 
-.sudoku-cell.prefilled {
+#sudoku-board .sudoku-cell.prefilled {
     background: var(--prefilled-bg);
     font-weight: bold;
     color: var(--prefilled-text);
 }
 
-.sudoku-cell.hint {
+#sudoku-board .sudoku-cell.hint {
     background: var(--hint-bg);
     color: var(--hint-text);
     font-weight: bold;
 }
 
-.sudoku-cell.sudoku-cell.incorrect {
+#sudoku-board .sudoku-cell.incorrect {
     background: var(--incorrect-bg);
 }
 
@@ -149,11 +149,11 @@ h1 {
     background-color: var(--box-alt-bg-2);
 }
 
-.sudoku-cell.sudoku-cell.valid {
+#sudoku-board .sudoku-cell.valid {
     background-color: var(--valid-bg);
 }
 
-.sudoku-cell.sudoku-cell.invalid {
+#sudoku-board .sudoku-cell.invalid {
     background-color: var(--incorrect-bg);
 }
 
