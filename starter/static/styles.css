@@ -120,15 +120,7 @@ h1 {
     font-weight: bold;
 }
 
-.sudoku-cell.incorrect {
-    background: var(--incorrect-bg);
-}
-
-.sudoku-cell.valid {
-    background: var(--valid-bg);
-}
-
-.sudoku-cell.invalid {
+.sudoku-cell.sudoku-cell.incorrect {
     background: var(--incorrect-bg);
 }
 
@@ -155,6 +147,14 @@ h1 {
 .sudoku-cell[data-block-row="1"][data-block-col="2"],
 .sudoku-cell[data-block-row="2"][data-block-col="1"] {
     background-color: var(--box-alt-bg-2);
+}
+
+.sudoku-cell.sudoku-cell.valid {
+    background-color: var(--valid-bg);
+}
+
+.sudoku-cell.sudoku-cell.invalid {
+    background-color: var(--incorrect-bg);
 }
 
 .controls {

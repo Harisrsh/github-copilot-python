@@ -124,18 +124,28 @@ function refreshLiveValidation() {
     for (let j = 0; j < SIZE; j++) {
       const idx = i * SIZE + j;
       const inp = inputs[idx];
-      if (inp.disabled) {
-        inp.className = 'sudoku-cell prefilled';
+      const baseClass = 'sudoku-cell';
+      const isPrefilled = inp.disabled;
+      const hasHint = inp.classList.contains('hint');
+      const isEmpty = !inp.value;
+
+      if (isPrefilled) {
+        inp.className = `${baseClass} prefilled`;
+        if (hasHint) {
+          inp.className = `${baseClass} hint`;
+        }
         continue;
       }
-      const val = inp.value;
-      if (!val) {
-        inp.className = 'sudoku-cell';
+
+      if (isEmpty) {
+        inp.className = `${baseClass}`;
         continue;
       }
-      const parsedValue = parseInt(val, 10);
+
+      const parsedValue = parseInt(inp.value, 10);
       const isValid = isCellValid(board, i, j, parsedValue);
-      inp.className = isValid ? 'sudoku-cell valid' : 'sudoku-cell invalid';
+      const nextClass = isValid ? `${baseClass} valid` : `${baseClass} invalid`;
+      inp.className = nextClass;
     }
   }
 }
@@ -158,6 +168,9 @@ function createBoardElement() {
       input.addEventListener('input', (e) => {
         const val = e.target.value.replace(/[^1-9]/g, '');
         e.target.value = val;
+        refreshLiveValidation();
+      });
+      input.addEventListener('keyup', () => {
         refreshLiveValidation();
       });
       rowDiv.appendChild(input);
