@@ -153,6 +153,8 @@ function createBoardElement() {
       input.className = 'sudoku-cell';
       input.dataset.row = i;
       input.dataset.col = j;
+      input.dataset.blockRow = Math.floor(i / 3);
+      input.dataset.blockCol = Math.floor(j / 3);
       input.addEventListener('input', (e) => {
         const val = e.target.value.replace(/[^1-9]/g, '');
         e.target.value = val;
